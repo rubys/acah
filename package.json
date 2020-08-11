@@ -1,6 +1,6 @@
 {
   "name": "@rubys/acah",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "bin": "./acah.js",
   "dependencies": {
     "@rubys/ical": "^0.0.1",
