@@ -1,0 +1,9 @@
+{
+  "name": "@rubys/acah",
+  "version": "0.0.2",
+  "bin": "./acah.js",
+  "dependencies": {
+    "@rubys/ical": "^0.0.1",
+    "deep-equal": "^2.0.3"
+  }
+}
