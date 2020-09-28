@@ -99,6 +99,9 @@ process.on('unhandledRejection', (reason, promise) => (
       let event = { categories: [{ name: category }], uid, start, end, summary, htmlDescription, location, url };
       events.push(event);
       calendars.add(path.basename(fileName));
+      
+    // add track events to the conference
+    allEvents.push(...events);
 
       // if there was a previous version of this entry, copy the stamp
       // and sequence to the new entry.  If the updated new entry
@@ -141,8 +144,6 @@ process.on('unhandledRejection', (reason, promise) => (
     // add/update whole track calendar
     await fs.writeFile(fileName, ics, 'utf8');
 
-    // add track events to the conference
-    allEvents.push(...events);
   }
 
   // generate a global calendar
