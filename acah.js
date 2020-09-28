@@ -58,6 +58,9 @@ process.on('unhandledRejection', (reason, promise) => (
     // collect a list of events for this track
     let events = [];
 
+    // list of used ids in this track
+    let ids = {};
+
     for (let session of sessions) {
       // scrape HTML for data
       let headers = [...session.matchAll(/<strong>\s*(.*?)\s*<\/strong>/gs)];
@@ -80,6 +83,14 @@ process.on('unhandledRejection', (reason, promise) => (
         console.error(`Bad anchor: ${prefix}-${id}`);
       }
 
+      // if id has already been taken, add a suffix
+      if (ids[id]) {
+        ids[id]++;
+        id += '-' + ids[id];
+      } else {
+        ids[id] = 1;
+      }
+
       // if necessary, back up to last <br> for start of html
       if (htmlDescription === '') {
         let lastBr = [...session.matchAll(/<br\s*\/?>/g)].pop();
@@ -100,7 +111,6 @@ process.on('unhandledRejection', (reason, promise) => (
       events.push(event);
       calendars.add(path.basename(fileName));
 
-
       // if there was a previous version of this entry, copy the stamp
       // and sequence to the new entry.  If the updated new entry
       // matches the previous entry, abort further processing of this
@@ -116,7 +126,6 @@ process.on('unhandledRejection', (reason, promise) => (
           continue;
         } else {
           event.sequence++;
-          console.log(event)
         };
       } catch (error) {
         if (error.code !== 'ENOENT') throw error;
