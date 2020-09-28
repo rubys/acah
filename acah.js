@@ -99,9 +99,7 @@ process.on('unhandledRejection', (reason, promise) => (
       let event = { categories: [{ name: category }], uid, start, end, summary, htmlDescription, location, url };
       events.push(event);
       calendars.add(path.basename(fileName));
-      
-    // add track events to the conference
-    allEvents.push(...events);
+
 
       // if there was a previous version of this entry, copy the stamp
       // and sequence to the new entry.  If the updated new entry
@@ -118,6 +116,7 @@ process.on('unhandledRejection', (reason, promise) => (
           continue;
         } else {
           event.sequence++;
+          console.log(event)
         };
       } catch (error) {
         if (error.code !== 'ENOENT') throw error;
@@ -127,6 +126,9 @@ process.on('unhandledRejection', (reason, promise) => (
       let ics = serialize({ calendar: { name: `${prefix}-${id}` }, events: [event] });
       await fs.writeFile(fileName, ics, 'utf8');
     }
+
+    // add track events to the conference
+    allEvents.push(...events);
 
     // determine and track name of whole track calendar
     let fileName = `${output}/${prefix}.ics`;
