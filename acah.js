@@ -21,6 +21,9 @@ process.on('unhandledRejection', (reason, promise) => (
   // keep track of the calendars produced
   let calendars = new Set();
 
+  // a list of all events for the conference
+  let allEvents = [];
+
   // iterate over all of the files in the tracks directory
   for (let track of await fs.readdir(input, 'utf8')) {
 
@@ -118,7 +121,7 @@ process.on('unhandledRejection', (reason, promise) => (
       }
 
       // write out the new or changed entry
-      let ics = serialize({ calendar: {name: `${prefix}-${id}`}, events: [event] });
+      let ics = serialize({ calendar: { name: `${prefix}-${id}` }, events: [event] });
       await fs.writeFile(fileName, ics, 'utf8');
     }
 
@@ -137,6 +140,23 @@ process.on('unhandledRejection', (reason, promise) => (
 
     // add/update whole track calendar
     await fs.writeFile(fileName, ics, 'utf8');
+
+    // add track events to the conference
+    allEvents.push(...events);
+  }
+
+  // generate a global calendar
+  let fileName = `${output}/global.ics`;
+  let ics = serialize({ calendar: { name: 'ApacheCon 2020' }, events: allEvents });
+  calendars.add(path.basename(fileName));
+
+  // update only if the calendar has changed, skip update
+  try {
+    let previous = await fs.readFile(fileName, 'utf8');
+    if (ics !== previous) await fs.writeFile(fileName, ics, 'utf8');
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+    await fs.writeFile(fileName, ics, 'utf8')
   }
 
   // remove any calendars that are no longer in the input
